@@ -18,6 +18,8 @@ xpack.fleet.packages:
   #  version: latest
   - name: docker
     version: latest
+  - name: kafka_log
+    version: latest
 xpack.fleet.agentPolicies:
   - name: Fleet-Server-Policy
     id: fleet-server-policy
@@ -38,25 +40,45 @@ xpack.fleet.agentPolicies:
       - name: confluent_cloud_audit_log
         package:
           name: kafka_log
-        streams:
-          data_stream:
-            dataset: kafka_log.generic
-          hosts:
-            - '${CONFLUENT_CLOUD_AUDIT_LOG_HOSTS}'
-          topics:
-            - '${CONFLUENT_CLOUD_AUDIT_LOG_TOPIC}'
-          group_id: '${CONFLUENT_CLOUD_AUDIT_LOG_GROUP_ID}'
-          client_id: '${CONFLUENT_CLOUD_AUDIT_LOG_CLIENT_ID}'
-          username: '${CONFLUENT_CLOUD_AUDIT_LOG_API_KEY}'
-          password: '${CONFLUENT_CLOUD_AUDIT_LOG_API_SECRET}'
-          parsers: null
-          ssl:
-            enabled: false
-            certificate: /etc/pki/client/cert.pem
-            key: /etc/pki/client/cert.key
-          tags:
-            - forwarded
-          publisher_pipeline.disable_host: true
+        inputs:
+          - type: kafka
+            enabled: true
+            streams:
+              - data_stream:
+                  dataset: kafka_log.generic
+                vars:
+                  - name: hosts
+                    value: ['${env.CONFLUENT_CLOUD_AUDIT_LOG_HOSTS}']
+                  - name: topics
+                    value: ['${env.CONFLUENT_CLOUD_AUDIT_LOG_TOPIC}']
+                  - name: group_id
+                    value: '${env.CONFLUENT_CLOUD_AUDIT_LOG_GROUP_ID}'
+                  - name: client_id
+                    value: '${env.CONFLUENT_CLOUD_AUDIT_LOG_CLIENT_ID}'
+                  - name: username
+                    value: '${env.CONFLUENT_CLOUD_AUDIT_LOG_API_KEY}'
+                  - name: password
+                    value: '${env.CONFLUENT_CLOUD_AUDIT_LOG_API_SECRET}'
+                  - name: parsers
+                    value: |
+                      - ndjson:
+                        target: ""
+                        add_error_key: true
+                        message_key: message
+                  - name: ssl
+                    value: "enabled: true"
+                    #  certificate: /etc/pki/client/cert.pem
+                    #  key: /etc/pki/client/cert.key
+                    #tags:
+                    #  - forwarded
+                    #publisher_pipeline.disable_host: true
+                # processors:
+                #   - decode_json_fields:
+                #     fields: ["message"]
+                #     process_array: true
+                #     target: "message_json"
+                #     expand_keys: true
+                #     add_error_key: true
       #- name: docker-1
       #  package:
       #    name: docker

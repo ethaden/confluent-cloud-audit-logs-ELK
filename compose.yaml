@@ -54,38 +54,44 @@ services:
      retries: 120
 
   kibana:
-   depends_on:
-     es01:
-       condition: service_healthy
-   image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
-   hostname: kibana
-   labels:
-     co.elastic.logs/module: kibana
-   volumes:
-     - kibanadata:/usr/share/kibana/data
-     - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
-   ports:
-     - ${KIBANA_PORT}:5601
-   environment:
-     - SERVERNAME=kibana
-     - ELASTICSEARCH_HOSTS=http://es01:9200
-     - ELASTICSEARCH_USERNAME=kibana_system
-     - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-     - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-     - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-     - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-     - XPACK_REPORTING_KIBANASERVER_HOSTNAME=localhost
-     - SERVER_SSL_ENABLED=false
-   mem_limit: ${KB_MEM_LIMIT}
-   healthcheck:
-     test:
-       [
-         "CMD-SHELL",
-         "curl -s -I --cacert config/certs/ca/ca.crt http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
-       ]
-     interval: 10s
-     timeout: 10s
-     retries: 120
+    depends_on:
+      es01:
+        condition: service_healthy
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    hostname: kibana
+    labels:
+      co.elastic.logs/module: kibana
+    volumes:
+      - kibanadata:/usr/share/kibana/data
+      - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=http://es01:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+      - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+      - XPACK_REPORTING_KIBANASERVER_HOSTNAME=localhost
+      - SERVER_SSL_ENABLED=false
+      # - CONFLUENT_CLOUD_AUDIT_LOG_HOSTS=${CONFLUENT_CLOUD_AUDIT_LOG_HOSTS}
+      # - CONFLUENT_CLOUD_AUDIT_LOG_API_KEY=${CONFLUENT_CLOUD_AUDIT_LOG_API_KEY}
+      # - CONFLUENT_CLOUD_AUDIT_LOG_API_SECRET=${CONFLUENT_CLOUD_AUDIT_LOG_API_SECRET}
+      # - CONFLUENT_CLOUD_AUDIT_LOG_GROUP_ID=${CONFLUENT_CLOUD_AUDIT_LOG_GROUP_ID}
+      # - CONFLUENT_CLOUD_AUDIT_LOG_CLIENT_ID=${CONFLUENT_CLOUD_AUDIT_LOG_CLIENT_ID}
+      # - CONFLUENT_CLOUD_AUDIT_LOG_TOPIC=${CONFLUENT_CLOUD_AUDIT_LOG_TOPIC}
+    mem_limit: ${KB_MEM_LIMIT}
+    healthcheck:
+      test:
+        [
+           "CMD-SHELL",
+          "curl -s -I --cacert config/certs/ca/ca.crt http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
 
   # Docker container for running the configured fleet agent. The agent will capture docker logs
   fleet-server:

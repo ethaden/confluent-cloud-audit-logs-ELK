@@ -1,0 +1,72 @@
+= Demo for sending Confluent Platform logs to ELK
+
+This demo show how to send log files to ELK (Elastic, Logstash, Kibana).
+
+== Preconditions
+
+Adapt the testbench to your version of Confluent Platform as required by modifying `.env`.
+
+== Running Confluent Platform
+
+Start the containers by running (if you want to use filebeat for fetching logs):
+```bash
+docker compose --profile filebeat up -d
+```
+
+Start the containers by running (if you want to use the new elastic agent for fetching logs, WiP):
+```bash
+docker compose --profile agent up -d
+```
+
+Stopping the containers without removing any volumes:
+```bash
+docker compose --profile filebeat down
+```
+
+Stopping the containers with removal of all created volumes (be careful!):
+```bash
+docker compose --profile filebeat down -v
+```
+
+Cleaning up (CAREFUL: THIS WILL DELETE ALL UNUSED VOLUMES):
+```bash
+docker volumes prune
+```
+
+== Usage
+
+Access `kibana` with your web browser here (you need to create an exception as the certificate is self-signed):
+
+* URL: `http://localhost:5601`
+* Username: `elastic`
+* Password: `elastic`
+
+Go to `Analytics->Discover`.
+
+If using the `filebeat` profile, create a new data view. Use any name (e.g. `kafka`) and filter on `filebeat-*`.
+
+Choose a time interval and export data as CSV file by clicking "Share".
+
+== Parsing the CSV files with Python
+
+Install Python 3 and set up the Python environment:
+
+```bash
+cd extract-log-files
+# Create a virtual environment in sub folder .venv
+python3 -m venv .venv
+# Activate the virtual environment
+source .venv/bin/activate
+# Install packages
+pip3 install pandas
+```
+
+You might need to adapt the script slightly if not working with a docker-based infrastructure as in this demo.
+Update the column names in the file. Then run it like this from the virtual environment in the main filder:
+
+```bash
+python3 extract-log-files/extract-log-files.py example/example-data.csv
+```
+
+This should create one log file per node.
+

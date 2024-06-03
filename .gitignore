@@ -1,0 +1,5 @@
+.vscode
+*.log
+.env
+extract-log-files/.env
+extract-log-files/.venv

@@ -31,7 +31,7 @@ Access `kibana` with your web browser here (you need to create an exception as t
 * Username: `elastic`
 * Password: `elastic`
 
-On the left side, click on `Observability`, then open `Stream`. After a while, you should start to see Kafka Audit Log events (`event.dataset==kafka_log.generic`).
+On the left side, click on `Observability`, then open `Stream`. After a while, you should start to see Kafka Audit Log events (`event.dataset: kafka_log.generic`).
 
 Go back to the main page and open `Analytics->Discover`. You should be able to see all the unpacked json events.
 Use a filter such as `event.dataset : "kafka_log.generic"` to show only the audit log data.

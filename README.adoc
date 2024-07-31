@@ -4,7 +4,7 @@ This demo shows how to stream audit Log data from Confluent Cloud directly into 
 
 == Preconditions
 
-Create an Audit Log API key as described in the Confluent Cloud documentation and update the `.env` file accordingly.
+Create an Audit Log API key as described in the Confluent Cloud documentation. Then copy the template ".env-template" to .env and update its content accordingly.
 
 == Running Confluent Platform
 
